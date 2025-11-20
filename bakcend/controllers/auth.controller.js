@@ -72,8 +72,36 @@ export const verifyEmail = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  res.json({ msg: "login" });
+  const { email, password } = req.body;
+  try {
+    if (!email && !password) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(400).json({ message: "User not found" });
+    }
+    const hashedPassword = await bcrypt.compare(password, user.password);
+    if (!hashedPassword) {
+      return res.status(400).json({ message: "Incorrect Password" });
+    }
+
+    generateTokenAndSetCookie(res, user._id);
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    res.status(200).json({
+      message: "Logged in sucessfully",
+      user: { ...user._doc, password: undefined },
+    });
+  } catch (error) {
+    console.log("Error in login endpoint", error);
+    res.status(400).json({ message: "Error in login endpoint", error });
+  }
 };
+
 export const logout = async (req, res) => {
-  res.json({ msg: "logout" });
+  res.clearCookie("token");
+  res.status(200).json({ message: "logged out successfully" });
 };
