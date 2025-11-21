@@ -175,3 +175,17 @@ export const resetPassword = async (req, res) => {
     res.status(400).json({ message: "Error reset password endpoint", error });
   }
 };
+
+export const checkAuth = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log("Error in check auth endpoint");
+    res.status(500).json({ message: "Error in check auth endpoint" });
+  }
+};

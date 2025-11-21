@@ -1,11 +1,13 @@
 import express from "express";
-import { connectToDatabase } from "./lib/connectDb.js";
 import authRoutes from "./routes/auth.routes.js";
+import cookieParser from "cookie-parser";
+import { connectToDatabase } from "./lib/connectDb.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 
