@@ -24,7 +24,7 @@ export const signup = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, 10);
 
     const verificationToken = Math.floor(
-      10000 + Math.random() * 900000
+      100000 + Math.random() * 900000
     ).toString();
 
     const user = new User({
@@ -63,7 +63,7 @@ export const verifyEmail = async (req, res) => {
     user.verificationTokenExpiresAt = undefined;
 
     await user.save();
-    await sendWelcomeEmail(user.email, user.name);
+    // await sendWelcomeEmail(user.email, user.name);
 
     res.status(200).json({
       message: "Email verified sucessfully",

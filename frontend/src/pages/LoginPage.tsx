@@ -1,17 +1,24 @@
 import React, { useState } from "react";
-import Input from "../components/input";
+import Input from "../components/Input";
 import { motion } from "framer-motion";
 import { Lock, Mail, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "../store/authStore.js";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  let isLoading = false;
+  const { login } = useAuthStore();
+
+  const isLoading = false;
+  const navigate = useNavigate();
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    login({ email, password });
+    navigate("/");
   };
   return (
     <motion.div
