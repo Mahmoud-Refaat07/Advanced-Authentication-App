@@ -1,12 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Input from "../components/Input";
+import { useAuthStore } from "../store/authStore.js";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const EmailVerificationPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef<HTMLInputElement[]>([]);
   const submitBtnRef = useRef<HTMLButtonElement>(null);
-  const isLoading = false;
+
+  const navigate = useNavigate();
+
+  const { error, isLoading, verifyEmail } = useAuthStore();
 
   const handleChange = (index: number, value: string) => {
     const newCode = [...code];
@@ -45,10 +51,19 @@ const EmailVerificationPage = () => {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const verificationCode = code.join("");
-    console.log(`Verification code submitted: ${verificationCode}`);
+    const verifyCode = code.join("");
+    try {
+      await verifyEmail(verifyCode);
+      navigate("/");
+      toast.success("Email verified successfully");
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response?.data?.message);
+    }
   };
 
   // Auto submit when all fields are filled
@@ -91,6 +106,11 @@ const EmailVerificationPage = () => {
               />
             ))}
           </div>
+          {error && (
+            <p className="text-red-500 font-semibold mt-2 text-center">
+              {error}
+            </p>
+          )}
           <motion.button
             className="mt-5 w-full py-3 px-4 bg-linear-to-r from-green-500 to-emerald-600
           text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700
@@ -99,7 +119,7 @@ const EmailVerificationPage = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             type="submit"
-            disabled={isLoading || code.some((digit) => !digit)}
+            disabled={code.some((digit) => !digit)}
             ref={submitBtnRef}
           >
             Verify
