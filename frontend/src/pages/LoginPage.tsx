@@ -10,15 +10,18 @@ const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const { login } = useAuthStore();
+  const { login, isLoading, error } = useAuthStore();
 
-  const isLoading = false;
   const navigate = useNavigate();
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    login({ email, password });
-    navigate("/");
+    try {
+      await login({ email, password });
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <motion.div
@@ -49,6 +52,7 @@ const LoginPage = () => {
           <div className="text-sm text-green-500 cursor-pointer hover:underline">
             Forgot Password?
           </div>
+
           <motion.button
             className="mt-5 w-full py-3 px-4 bg-linear-to-r from-green-500 to-emerald-600
                   text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700
